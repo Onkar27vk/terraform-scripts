@@ -18,6 +18,7 @@ resource "aws_instance" "test" {
   instance_type = "t2.micro" # Change instance type as needed
   subnet_id     =  "subnet-03ddcb5c08c34f4b4"
   security_groups = ["sg-0c3782575de6c5299"]
+  key_name      = "ps-key"
 
   tags = {
     Name = "My_EC2_Instance"
