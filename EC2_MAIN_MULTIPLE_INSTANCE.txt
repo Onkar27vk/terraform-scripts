@@ -1,0 +1,40 @@
+provider "aws" {
+  region = "ap-south-1"  # Change to your desired region
+}
+
+terraform {
+  backend "s3" {
+    bucket         = "dev-state1"  # Change to your unique bucket name
+    key            = "global/s3/terraorm.tfstate"            # Path within the bucket
+    region         = "ap-south-1" # Change to your desired region
+    dynamodb_table = "terraform-state--lock"
+    encrypt        = true                          # Enable server-side encryption
+  }
+}
+
+
+resource "aws_instance" "test" {
+  count         = 3
+  ami           = "ami-0dee22c13ea7a9a67"  # Replace with a valid AMI ID for your region
+  instance_type = "t2.micro" # Change instance type as needed
+  subnet_id     =  "subnet-03ddcb5c08c34f4b4"
+  security_groups = ["sg-0c3782575de6c5299"]
+
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp2"
+  }
+
+  tags = {
+    Name = "My_EC2_Instance-$ {count.index}"
+
+  }
+}
+
+output "instance_public_ips" {
+  value = aws_instance.test[*].public_ip
+}
+
+output "instance_ids" {
+  value = aws_instance.test[*].id
+}
